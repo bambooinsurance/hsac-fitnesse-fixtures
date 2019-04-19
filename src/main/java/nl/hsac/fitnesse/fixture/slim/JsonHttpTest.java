@@ -55,6 +55,9 @@ public class JsonHttpTest extends HttpTest {
     }
 
     public Object jsonPath(String path) {
+        if(!jsonPathExists(path))
+            return "";
+
         String responseString = getResponseBody();
         String jsonPath = getPathExpr(path);
         return getPathHelper().getJsonPath(responseString, jsonPath);
@@ -87,16 +90,26 @@ public class JsonHttpTest extends HttpTest {
     }
 
     public Object elementOfJsonPath(int index, String path) {
+        if(!jsonPathExists(path)) {
+            return "";
+        }
+
         List<Object> all = listJsonPathMatches(path);
         return all.get(index);
     }
 
     public int jsonPathCount(String path) {
+        if(!jsonPathExists(path))
+            return 0;
+
         List<Object> all = listJsonPathMatches(path);
         return all.size();
     }
 
     public ArrayList<Object> listJsonPathMatches(String path) {
+        if(!jsonPathExists(path))
+            return new ArrayList<>();
+
         String responseString = getResponseBody();
         String jsonPath = getPathExpr(path);
         List<Object> results = getPathHelper().getAllJsonPath(responseString, jsonPath);
@@ -118,6 +131,9 @@ public class JsonHttpTest extends HttpTest {
      * @throws RuntimeException if no valid response was available or Json Path could not be evaluated.
      */
     public String allJsonPathMatches(String expr) {
+        if(!jsonPathExists(expr))
+            return "";
+
         String result = null;
         List<Object> allJsonPath = listJsonPathMatches(expr);
         if (allJsonPath != null && !allJsonPath.isEmpty()) {
@@ -140,6 +156,9 @@ public class JsonHttpTest extends HttpTest {
      * @param value the new value to set
      */
     public void setJsonPathTo(String path, String value) {
+        if(!jsonPathExists(path))
+            return;
+
         String jsonStr = getResponseBody();
         String jsonPath = getPathExpr(path);
         String newResponse = getPathHelper().updateJsonPathWithValue(jsonStr, jsonPath, value);
@@ -147,6 +166,9 @@ public class JsonHttpTest extends HttpTest {
     }
 
     public boolean repeatUntilJsonPathIs(final String jsonPath, final Object expectedValue) {
+        if(!jsonPathExists(jsonPath))
+            return false;
+
         RepeatCompletion completion;
         if (expectedValue == null) {
             completion = new RepeatLastCall() {
